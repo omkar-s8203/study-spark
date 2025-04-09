@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
-import { Brain, Send, User } from 'lucide-react';
+import { Brain, Send, User, Volume2 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -46,6 +46,13 @@ const AIChat = () => {
   });
 
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+
+  const speakText = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    speechSynthesis.cancel(); // cancel previous speech if any
+    speechSynthesis.speak(utterance);
+  };
 
   const onSubmit = async (data: FormData) => {
     const userMessage: Message = {
@@ -108,14 +115,25 @@ const AIChat = () => {
                       <User className="h-5 w-5" />
                     )}
                   </Avatar>
-                  <div
-                    className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                      message.sender === 'ai'
-                        ? 'bg-background border border-border'
-                        : 'bg-study-primary text-white'
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <div className="flex flex-col max-w-[80%]">
+                    <div
+                      className={`rounded-lg px-4 py-2 ${
+                        message.sender === 'ai'
+                          ? 'bg-background border border-border'
+                          : 'bg-study-primary text-white'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    </div>
+                    {message.sender === 'ai' && (
+                      <button
+                        onClick={() => speakText(message.content)}
+                        className="flex items-center gap-1 mt-1 text-xs text-study-primary hover:underline"
+                      >
+                        <Volume2 className="h-4 w-4" />
+                        Listen
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
