@@ -1,73 +1,51 @@
-# Welcome to your Lovable project
+# 📚 StudySpark – AI-Powered Study Buddy
 
-## Project info
+StudySpark is a hackathon project built to revolutionize the way students learn and manage their academic life. With the power of AI, we aim to make studying smarter, not harder.
 
-**URL**: https://lovable.dev/projects/249e0909-4d07-4e77-ac9d-24734b7fa5b5
+## 🚀 Problem Statement
 
-## How can I edit this code?
+**Problem:**  
+Students often struggle to find relevant study materials, manage their time effectively, and resolve doubts on time.
 
-There are several ways of editing your application.
+**Challenge:**  
+Build an AI-powered chatbot that helps recommend study materials, answer questions, and streamline study planning.
 
-**Use Lovable**
+## 💡 Solution
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/249e0909-4d07-4e77-ac9d-24734b7fa5b5) and start prompting.
+StudySpark provides a smart and intuitive platform where students can:
+- Get AI-driven study assistance
+- Access curated study materials
+- Manage time using productivity tools like To-Do lists, Focus Timers, and Calendars
+- Engage with a community (future scope)
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Tech Stack
 
-**Use your preferred IDE**
+| Layer        | Technology        |
+|-------------|-------------------|
+| Frontend     | React (Vite)       |
+| Database     | Supabase           |
+| AI Chatbot   | OpenAI GPT         |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## ✨ Features
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- 🤖 **AI Study Assistant** – Chatbot to resolve doubts and suggest relevant resources  
+- 📄 **Study Materials** – Curated notes and resources tailored by AI  
+- ⏱️ **Focus Timer** – Pomodoro-style timer to improve concentration  
+- 📝 **To-Do List** – Organize daily tasks and stay on track  
+- 📆 **Calendar Integration** – Visual schedule planner  
+- 🧑‍🤝‍🧑 **Community Forum** *(Future Scope)* – Peer discussions and help
 
-Follow these steps:
+## 📍 How to Run Locally
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/studyspark.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to the project directory
+cd studyspark
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/249e0909-4d07-4e77-ac9d-24734b7fa5b5) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
