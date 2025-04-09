@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
-import { Brain, Send, User, Volume2 } from 'lucide-react';
+import { Brain, Send, User, Volume2, Mic } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -50,8 +50,33 @@ const AIChat = () => {
   const speakText = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
-    speechSynthesis.cancel(); // cancel previous speech if any
+    speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
+  };
+
+  const handleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      form.setValue('message', transcript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error', event);
+      toast.error('Speech recognition error.');
+    };
   };
 
   const onSubmit = async (data: FormData) => {
@@ -68,7 +93,6 @@ const AIChat = () => {
 
     try {
       const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-pro-latest' });
-
       const result = await model.generateContent(data.message);
       const response = await result.response;
       const text = response.text();
@@ -174,6 +198,9 @@ const AIChat = () => {
                     </FormItem>
                   )}
                 />
+                <Button type="button" onClick={handleVoiceInput} className="p-2" disabled={isLoading}>
+                  <Mic className="h-5 w-5" />
+                </Button>
                 <Button type="submit" className="gradient-bg hover:opacity-90" disabled={isLoading}>
                   <Send className="h-5 w-5" />
                   <span className="sr-only">Send</span>
