@@ -1,16 +1,16 @@
-
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { Brain, Send, User } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const formSchema = z.object({
   message: z.string().min(1, { message: 'Message cannot be empty' }),
@@ -28,7 +28,7 @@ type Message = {
 const initialMessages: Message[] = [
   {
     id: '1',
-    content: "Hello! I'm your AI study assistant. How can I help you today?",
+    content: "Hi there! I'm your AI Study Assistant powered by Google Gemini. How can I help you today?",
     sender: 'ai',
     timestamp: new Date(),
   },
@@ -45,24 +45,7 @@ const AIChat = () => {
     },
   });
 
-  const mockAIResponse = (userMessage: string): Promise<string> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Simple keyword-based responses
-        if (userMessage.toLowerCase().includes('math')) {
-          resolve('For math topics, I recommend checking out Khan Academy or our math study materials section. What specific math concept are you studying?');
-        } else if (userMessage.toLowerCase().includes('physics')) {
-          resolve('Physics can be challenging! The key is understanding the fundamental principles. Our physics resources include video explanations and practice problems. Would you like me to find some resources for you?');
-        } else if (userMessage.toLowerCase().includes('exam') || userMessage.toLowerCase().includes('test')) {
-          resolve('Preparing for an exam? Make sure to create a study schedule, use active recall techniques, and take practice tests. I can help you create a study plan if you tell me more about your upcoming exam.');
-        } else if (userMessage.toLowerCase().includes('help')) {
-          resolve("I'm here to help! I can recommend study materials, answer questions about subjects you're learning, help you create study plans, or just chat about academic topics. What would you like assistance with?");
-        } else {
-          resolve("That's an interesting topic! I can help you find study materials or explain concepts related to this. Would you like me to recommend some resources?");
-        }
-      }, 1000);
-    });
-  };
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
   const onSubmit = async (data: FormData) => {
     const userMessage: Message = {
@@ -77,19 +60,23 @@ const AIChat = () => {
     setIsLoading(true);
 
     try {
-      const aiResponse = await mockAIResponse(data.message);
-      
+      const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-pro-latest' });
+
+      const result = await model.generateContent(data.message);
+      const response = await result.response;
+      const text = response.text();
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: aiResponse,
+        content: text,
         sender: 'ai',
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error('Error getting AI response:', error);
-      toast.error('Unable to get a response. Please try again.');
+      console.error('Error:', error);
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +115,7 @@ const AIChat = () => {
                         : 'bg-study-primary text-white'
                     }`}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                   </div>
                 </div>
               ))}
@@ -169,11 +156,7 @@ const AIChat = () => {
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="gradient-bg hover:opacity-90"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="gradient-bg hover:opacity-90" disabled={isLoading}>
                   <Send className="h-5 w-5" />
                   <span className="sr-only">Send</span>
                 </Button>
