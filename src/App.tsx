@@ -1,9 +1,9 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -12,7 +12,10 @@ import FocusTimer from "./pages/FocusTimer";
 import TodoList from "./pages/TodoList";
 import StudyMaterials from "./pages/StudyMaterials";
 import Community from "./pages/Community";
+import Calendar from "./pages/Calendar"; // ✅ Calendar route
+import Profile from "./pages/Profile";   // ✅ Profile route
 import NotFound from "./pages/NotFound";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -30,7 +33,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+
             {/* Protected Routes */}
             <Route path="/ai-chat" element={
               <ProtectedRoute>
@@ -57,7 +60,17 @@ const App = () => (
                 <Community />
               </ProtectedRoute>
             } />
-            
+            <Route path="/calendar" element={
+              <ProtectedRoute>
+                <Calendar />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={ // ✅ New Profile route
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>

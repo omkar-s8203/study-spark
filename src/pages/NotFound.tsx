@@ -1,33 +1,26 @@
-
 import React from 'react';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from '@/components/ui/button';
 import { Brain } from 'lucide-react';
-import { useEffect } from "react";
 
 const NotFound = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
-  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
       <div className="text-center max-w-md">
         <div className="flex justify-center mb-4">
-          <Brain className="h-16 w-16 text-study-primary" />
+          <Brain className="h-16 w-16 text-study-primary animate-bounce" />
         </div>
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-muted-foreground mb-6">
-          Oops! We couldn't find the page you're looking for.
+        <h1 className="text-3xl font-bold mb-4">🚧 Feature Coming Soon!</h1>
+        <p className="text-lg text-muted-foreground mb-4">
+          This feature is currently under development and will be released in the next phase of StudySpark.
+        </p>
+        <p className="text-muted-foreground mb-4">
+          <span className="font-medium">The Bro Code Team</span>, led by <span className="font-medium text-study-primary">Omkar Suryawanshi</span>, is actively working on this module to make it yours soon!
         </p>
         <p className="text-muted-foreground mb-8">
-          The page might have been moved, deleted, or maybe never existed.
+          Stay tuned for more updates and smarter tools to boost your learning journey.
         </p>
         <Button
           onClick={() => navigate('/')}
