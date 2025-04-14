@@ -4,13 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
-import { Brain, Send, User, Volume2, Mic } from 'lucide-react';
+import { Brain, Send, User, Volume2, Mic, FileText } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// ✅ PDF.js updated import
+import * as pdfjsLib from 'pdfjs-dist';
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const formSchema = z.object({
   message: z.string().min(1, { message: 'Message cannot be empty' }),
@@ -37,6 +41,7 @@ const initialMessages: Message[] = [
 const AIChat = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
+  const [pdfText, setPdfText] = useState('');
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -55,7 +60,7 @@ const AIChat = () => {
   };
 
   const handleVoiceInput = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error('Speech recognition is not supported in this browser.');
       return;
@@ -68,12 +73,12 @@ const AIChat = () => {
 
     recognition.start();
 
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       form.setValue('message', transcript);
     };
 
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error', event);
       toast.error('Speech recognition error.');
     };
@@ -93,7 +98,11 @@ const AIChat = () => {
 
     try {
       const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-pro-latest' });
-      const result = await model.generateContent(data.message);
+
+      // If there's uploaded PDF text, append it as context
+      const prompt = pdfText ? `Based on this document content:\n${pdfText}\n\nUser question: ${data.message}` : data.message;
+
+      const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
 
@@ -111,6 +120,30 @@ const AIChat = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const typedarray = new Uint8Array(reader.result as ArrayBuffer);
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      let textContent = '';
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const text = await page.getTextContent();
+        const pageText = text.items.map((item: any) => item.str).join(' ');
+        textContent += ` ${pageText}`;
+      }
+
+      setPdfText(textContent);
+      toast.success('PDF uploaded and processed successfully!');
+    };
+
+    reader.readAsArrayBuffer(file);
   };
 
   return (
@@ -198,6 +231,12 @@ const AIChat = () => {
                     </FormItem>
                   )}
                 />
+                <input type="file" accept="application/pdf" onChange={handlePdfUpload} className="hidden" id="pdfUpload" />
+                <label htmlFor="pdfUpload">
+                  <Button type="button" className="p-2" disabled={isLoading}>
+                    <FileText className="h-5 w-5" />
+                  </Button>
+                </label>
                 <Button type="button" onClick={handleVoiceInput} className="p-2" disabled={isLoading}>
                   <Mic className="h-5 w-5" />
                 </Button>
